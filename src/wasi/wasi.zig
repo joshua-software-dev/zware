@@ -379,7 +379,7 @@ pub fn poll_oneoff(vm: *VirtualMachine) WasmError!void {
 
 pub fn proc_exit(vm: *VirtualMachine) WasmError!void {
     const param0 = vm.popOperand(i32);
-    const code: u32 = std.math.absCast(param0);
+    const code: u32 = @abs(param0);
     std.os.exit(@truncate(code));
 }
 
