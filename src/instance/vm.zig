@@ -1188,7 +1188,13 @@ pub const VirtualMachine = struct {
         const c2 = self.popOperand(i32);
         const c1 = self.popOperand(i32);
 
-        const abs = try math.absInt(c2);
+        if (c2 == std.math.minInt(@TypeOf(c2)))
+        {
+            // mimic old std math.absInt behavior
+            return error.Overflow;
+        }
+
+        const abs: i32 = @intCast(@abs(c2));
         const rem = try math.rem(i32, c1, abs);
 
         self.pushOperandNoCheck(i32, rem);
@@ -1355,7 +1361,13 @@ pub const VirtualMachine = struct {
         const c2 = self.popOperand(i64);
         const c1 = self.popOperand(i64);
 
-        const abs = try math.absInt(c2);
+        if (c2 == std.math.minInt(@TypeOf(c2)))
+        {
+            // mimic old std math.absInt behavior
+            return error.Overflow;
+        }
+
+        const abs: i64 = @intCast(@abs(c2));
         const rem = try math.rem(i64, c1, abs);
 
         self.pushOperandNoCheck(i64, rem);
@@ -1451,7 +1463,7 @@ pub const VirtualMachine = struct {
     fn @"f32.abs"(self: *VirtualMachine, ip: usize, code: []Rr) WasmError!void {
         const c1 = self.popOperand(f32);
 
-        self.pushOperandNoCheck(f32, math.fabs(c1));
+        self.pushOperandNoCheck(f32, @abs(c1));
 
         return dispatch(self, ip + 1, code);
     }
@@ -1607,9 +1619,9 @@ pub const VirtualMachine = struct {
         const c1 = self.popOperand(f32);
 
         if (math.signbit(c2)) {
-            self.pushOperandNoCheck(f32, -math.fabs(c1));
+            self.pushOperandNoCheck(f32, -@abs(c1));
         } else {
-            self.pushOperandNoCheck(f32, math.fabs(c1));
+            self.pushOperandNoCheck(f32, @abs(c1));
         }
 
         return dispatch(self, ip + 1, code);
@@ -1618,7 +1630,7 @@ pub const VirtualMachine = struct {
     fn @"f64.abs"(self: *VirtualMachine, ip: usize, code: []Rr) WasmError!void {
         const c1 = self.popOperand(f64);
 
-        self.pushOperandNoCheck(f64, math.fabs(c1));
+        self.pushOperandNoCheck(f64, @abs(c1));
 
         return dispatch(self, ip + 1, code);
     }
@@ -1766,9 +1778,9 @@ pub const VirtualMachine = struct {
         const c1 = self.popOperand(f64);
 
         if (math.signbit(c2)) {
-            self.pushOperandNoCheck(f64, -math.fabs(c1));
+            self.pushOperandNoCheck(f64, -@abs(c1));
         } else {
-            self.pushOperandNoCheck(f64, math.fabs(c1));
+            self.pushOperandNoCheck(f64, @abs(c1));
         }
 
         return dispatch(self, ip + 1, code);
